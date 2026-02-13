@@ -28,7 +28,7 @@ die() { log "FATAL: $*"; exit 1; }
 cleanup_canary() {
   if [ -f "${RELEASE_DIR}/docker-compose.canary.yml" ]; then
     cd "${RELEASE_DIR}" 2>/dev/null || true
-    docker compose -f "${COMPOSE_FILE}" -f docker-compose.canary.yml \
+    docker compose -f docker-compose.canary.yml \
       -p "${PROJECT_NAME}-canary" down --remove-orphans 2>/dev/null || true
     rm -f "${RELEASE_DIR}/docker-compose.canary.yml"
   fi
@@ -83,32 +83,52 @@ log "Building Docker image"
 cd "${RELEASE_DIR}"
 docker compose -f "${COMPOSE_FILE}" build --no-cache 2>&1 || die "Docker build failed"
 
-# ── Canary health check (on alternate port to avoid conflicts) ──
+# ── Canary health check (standalone compose with canary port only) ──
 log "Starting canary on port ${CANARY_PORT}"
 cat > "${RELEASE_DIR}/docker-compose.canary.yml" << CANARY
 services:
   openclaw-gateway:
+    image: openclaw:local
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOME: /home/node
+      TERM: xterm-256color
+    volumes:
+      - /opt/openclaw/shared/openclaw-data:/home/node/.openclaw
+      - /opt/openclaw/shared/workspace:/home/node/.openclaw/workspace
     ports:
       - "127.0.0.1:${CANARY_PORT}:18789"
+    init: true
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+    command: [ "node", "openclaw.mjs", "gateway", "--allow-unconfigured", "--bind", "lan", "--port", "18789" ]
 CANARY
 
-docker compose -f "${COMPOSE_FILE}" -f docker-compose.canary.yml \
+docker compose -f docker-compose.canary.yml \
   -p "${PROJECT_NAME}-canary" up -d 2>&1 || {
   cleanup_canary
   die "Canary start failed"
 }
 
+log "Waiting 45s for gateway cold start..."
+sleep 45
+
 HEALTH_OK=false
-for i in $(seq 1 20); do
-  sleep 3
+for i in $(seq 1 15); do
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 \
     "http://127.0.0.1:${CANARY_PORT}/" 2>/dev/null || echo "000")
-  log "Canary health ${i}/20: HTTP ${HTTP_CODE}"
+  log "Canary health ${i}/15: HTTP ${HTTP_CODE}"
   if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 500 ]; then
     HEALTH_OK=true
     log "Canary healthy!"
     break
   fi
+  sleep 5
 done
 
 cleanup_canary
@@ -141,17 +161,18 @@ log "Starting production"
 cd "${CURRENT_LINK}"
 docker compose -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}" up -d --remove-orphans 2>&1
 
-# Post-deploy verification
-sleep 5
+# Post-deploy verification (gateway takes ~45s to cold start)
+log "Waiting 45s for production cold start..."
+sleep 45
 PROD_OK=false
-for i in $(seq 1 10); do
+for i in $(seq 1 15); do
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 \
     "http://127.0.0.1:18789/" 2>/dev/null || echo "000")
   if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 500 ]; then
     PROD_OK=true
     break
   fi
-  sleep 3
+  sleep 5
 done
 
 if [ "$PROD_OK" != "true" ]; then

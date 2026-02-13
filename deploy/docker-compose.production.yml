@@ -39,4 +39,4 @@ services:
       options:
         max-size: "50m"
         max-file: "5"
-    command: [ "node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789" ]
+    command: [ "node", "openclaw.mjs", "gateway", "--allow-unconfigured", "--bind", "lan", "--port", "18789" ]
