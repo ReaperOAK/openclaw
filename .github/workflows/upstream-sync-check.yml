@@ -1,0 +1,41 @@
+name: Upstream Sync Check
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday 9am UTC
+  workflow_dispatch:
+
+jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check upstream divergence
+        run: |
+          git remote add upstream https://github.com/openclaw/openclaw.git 2>/dev/null || true
+          git fetch upstream main --quiet
+
+          BEHIND=$(git rev-list --count HEAD..upstream/main 2>/dev/null || echo 0)
+          AHEAD=$(git rev-list --count upstream/main..HEAD 2>/dev/null || echo 0)
+
+          echo "## Upstream Sync Status" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Behind upstream | **${BEHIND} commits** |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Ahead of upstream | **${AHEAD} commits** (your customizations) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$BEHIND" -gt 50 ]; then
+            echo "::warning::You are ${BEHIND} commits behind upstream. Sync strongly recommended."
+            echo "> ⚠️ **Action needed:** Run upstream sync to avoid large merge conflicts." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$BEHIND" -gt 0 ]; then
+            echo "::notice::You are ${BEHIND} commits behind upstream."
+            echo "> ℹ️ Minor divergence — sync at your convenience." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "> ✅ Fully up to date with upstream." >> "$GITHUB_STEP_SUMMARY"
+          fi

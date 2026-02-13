@@ -1,0 +1,151 @@
+name: Deploy to OCI
+
+on:
+  push:
+    branches: [main, deploy]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "**/*.mdx"
+      - ".agents/**"
+      - "skills/**"
+      - "apps/macos/**"
+      - "apps/ios/**"
+      - "apps/android/**"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy (branch, tag, or SHA)"
+        required: false
+        default: "main"
+
+concurrency:
+  group: deploy-oci
+  cancel-in-progress: false
+
+env:
+  DEPLOY_USER: ubuntu
+  DEPLOY_DIR: /opt/openclaw
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm tsgo
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: http://80.225.219.45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.sha }}
+
+      - name: Extract version info
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "release_name=${VERSION}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.OCI_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.OCI_SSH_PORT || 22 }} -H ${{ secrets.OCI_SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Upload deployment scripts
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30"
+          SCP="scp ${SSH_OPTS}"
+          SSH="ssh ${SSH_OPTS} ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}"
+
+          # Ensure scripts dir exists
+          $SSH "mkdir -p ${{ env.DEPLOY_DIR }}/scripts"
+
+          # Upload all deployment scripts
+          $SCP scripts/deploy-remote.sh ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}:${{ env.DEPLOY_DIR }}/scripts/deploy.sh
+          $SCP scripts/rollback-remote.sh ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}:${{ env.DEPLOY_DIR }}/scripts/rollback.sh
+          $SCP scripts/health-check-remote.sh ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}:${{ env.DEPLOY_DIR }}/scripts/health-check.sh
+
+          # Make executable
+          $SSH "chmod +x ${{ env.DEPLOY_DIR }}/scripts/*.sh"
+
+      - name: Run deployment
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30"
+          SSH="ssh ${SSH_OPTS} ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}"
+
+          echo "::group::Deploying ${{ steps.version.outputs.release_name }}"
+          $SSH "${{ env.DEPLOY_DIR }}/scripts/deploy.sh '${{ github.sha }}' '${{ steps.version.outputs.version }}'"
+          echo "::endgroup::"
+
+      - name: Verify deployment
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30"
+          SSH="ssh ${SSH_OPTS} ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}"
+
+          $SSH "${{ env.DEPLOY_DIR }}/scripts/health-check.sh 10 3"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30"
+          SSH="ssh ${SSH_OPTS} ${{ env.DEPLOY_USER }}@${{ secrets.OCI_SSH_HOST }}"
+
+          echo "::warning::Deployment failed — initiating rollback"
+          $SSH "${{ env.DEPLOY_DIR }}/scripts/rollback.sh" || true
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          VERSION="${{ steps.version.outputs.release_name }}"
+
+          if [ -n "${{ secrets.DEPLOY_WEBHOOK_URL }}" ]; then
+            curl -s -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"OpenClaw deploy **${VERSION}**: ${STATUS}\"}" || true
+          fi
+
+          echo "## Deployment: ${STATUS}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Release: \`${VERSION}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- SHA: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Triggered by: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
