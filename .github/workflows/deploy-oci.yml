@@ -55,8 +55,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Test
-        run: pnpm test
+      - name: Test (unit only — full suite runs on upstream CI)
+        run: pnpm vitest run --config vitest.unit.config.ts --pool=forks --maxWorkers=2 --silent=passed-only
+        env:
+          OPENCLAW_TEST_VM_FORKS: "0"
 
   deploy:
     needs: test
