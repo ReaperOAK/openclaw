@@ -131,33 +131,6 @@ export async function processMessage(params: {
   groupHistory?: GroupHistoryEntry[];
   suppressGroupHistoryClear?: boolean;
 }) {
-  // ── READ-ONLY GUARD ────────────────────────────────────────────────
-  // When actions.sendMessage is explicitly false, the channel is read-only.
-  // Log the inbound message for awareness but skip ALL outbound activity
-  // (ack reactions, AI processing, reply delivery).  This is the canonical
-  // interception point—deliverWebReply and the plugin hook system are both
-  // bypassed by the web-auto-reply pipeline, so we must block here.
-  const whatsappActions = params.cfg.channels?.whatsapp?.actions;
-  if (whatsappActions && whatsappActions.sendMessage === false) {
-    const fromDisplay =
-      params.msg.chatType === "group"
-        ? (params.msg.conversationId ?? params.msg.from)
-        : params.msg.from;
-    params.replyLogger.info(
-      {
-        from: fromDisplay,
-        chatType: params.msg.chatType,
-        body: elide(params.msg.body, 120),
-      },
-      "WhatsApp read-only: inbound message logged, reply BLOCKED",
-    );
-    whatsappInboundLog.info(
-      `[READ-ONLY] Inbound from ${fromDisplay} (${params.msg.chatType}) — reply suppressed`,
-    );
-    return false;
-  }
-  // ── END READ-ONLY GUARD ────────────────────────────────────────────
-
   const conversationId = params.msg.conversationId ?? params.msg.from;
   const storePath = resolveStorePath(params.cfg.session?.store, {
     agentId: params.route.agentId,
