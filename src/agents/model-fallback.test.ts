@@ -147,7 +147,10 @@ describe("runWithModelFallback", () => {
     expect(run.mock.calls[1]?.[1]).toBe("claude-haiku-3-5");
   });
 
-  it("skips providers when all profiles are in cooldown", async () => {
+  it("does not skip providers when profiles are only rate-limit cooled down", async () => {
+    // Rate-limit cooldowns are model-specific; a different model on the same
+    // provider should still be attempted (e.g., gpt-5.2 rate-limited should
+    // not block gpt-5-mini).
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-"));
     const provider = `cooldown-test-${crypto.randomUUID()}`;
     const profileId = `${provider}:default`;
@@ -164,6 +167,64 @@ describe("runWithModelFallback", () => {
       usageStats: {
         [profileId]: {
           cooldownUntil: Date.now() + 60_000,
+        },
+      },
+    };
+
+    saveAuthProfileStore(store, tempDir);
+
+    const cfg = makeCfg({
+      agents: {
+        defaults: {
+          model: {
+            primary: `${provider}/m1`,
+            fallbacks: ["fallback/ok-model"],
+          },
+        },
+      },
+    });
+    const run = vi.fn().mockImplementation(async (providerId, _modelId) => {
+      if (providerId === provider) {
+        return "ok-from-cooled-provider";
+      }
+      return "fallback-reached";
+    });
+
+    try {
+      const result = await runWithModelFallback({
+        cfg,
+        provider,
+        model: "m1",
+        agentDir: tempDir,
+        run,
+      });
+
+      // Should attempt the cooled-down provider since it's only a rate-limit cooldown
+      expect(result.result).toBe("ok-from-cooled-provider");
+      expect(run.mock.calls[0]?.[0]).toBe(provider);
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("skips providers when all profiles are billing-disabled", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-"));
+    const provider = `billing-test-${crypto.randomUUID()}`;
+    const profileId = `${provider}:default`;
+
+    const store: AuthProfileStore = {
+      version: AUTH_STORE_VERSION,
+      profiles: {
+        [profileId]: {
+          type: "api_key",
+          provider,
+          key: "test-key",
+        },
+      },
+      usageStats: {
+        [profileId]: {
+          disabledUntil: Date.now() + 60_000,
+          disabledReason: "billing",
         },
       },
     };

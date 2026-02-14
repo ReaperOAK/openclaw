@@ -390,7 +390,7 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
     }
   });
 
-  it("fails over when all profiles are in cooldown and fallbacks are configured", async () => {
+  it("fails over when all profiles are billing-disabled and fallbacks are configured", async () => {
     vi.useFakeTimers();
     try {
       const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agent-"));
@@ -401,8 +401,16 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
       try {
         await writeAuthStore(agentDir, {
           usageStats: {
-            "openai:p1": { lastUsed: 1, cooldownUntil: now + 60 * 60 * 1000 },
-            "openai:p2": { lastUsed: 2, cooldownUntil: now + 60 * 60 * 1000 },
+            "openai:p1": {
+              lastUsed: 1,
+              disabledUntil: now + 60 * 60 * 1000,
+              disabledReason: "billing",
+            },
+            "openai:p2": {
+              lastUsed: 2,
+              disabledUntil: now + 60 * 60 * 1000,
+              disabledReason: "billing",
+            },
           },
         });
 
@@ -423,7 +431,6 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
           }),
         ).rejects.toMatchObject({
           name: "FailoverError",
-          reason: "rate_limit",
           provider: "openai",
           model: "mock-1",
         });

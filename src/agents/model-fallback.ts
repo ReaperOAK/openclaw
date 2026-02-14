@@ -2,7 +2,7 @@ import type { OpenClawConfig } from "../config/config.js";
 import type { FailoverReason } from "./pi-embedded-helpers.js";
 import {
   ensureAuthProfileStore,
-  isProfileInCooldown,
+  isProfileBillingDisabled,
   resolveAuthProfileOrder,
 } from "./auth-profiles.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
@@ -247,14 +247,16 @@ export async function runWithModelFallback<T>(params: {
         store: authStore,
         provider: candidate.provider,
       });
-      const isAnyProfileAvailable = profileIds.some((id) => !isProfileInCooldown(authStore, id));
+      const isAnyProfileUsable = profileIds.some((id) => !isProfileBillingDisabled(authStore, id));
 
-      if (profileIds.length > 0 && !isAnyProfileAvailable) {
-        // All profiles for this provider are in cooldown; skip without attempting
+      if (profileIds.length > 0 && !isAnyProfileUsable) {
+        // All profiles for this provider are billing-disabled; skip without attempting.
+        // Note: rate-limit cooldowns are model-specific and do NOT block fallback
+        // to different models on the same provider.
         attempts.push({
           provider: candidate.provider,
           model: candidate.model,
-          error: `Provider ${candidate.provider} is in cooldown (all profiles unavailable)`,
+          error: `Provider ${candidate.provider} is disabled (all profiles billing-blocked)`,
           reason: "rate_limit",
         });
         continue;

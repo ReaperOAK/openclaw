@@ -26,6 +26,23 @@ export function isProfileInCooldown(store: AuthProfileStore, profileId: string):
 }
 
 /**
+ * Check if a profile is disabled due to billing/account-level issues.
+ * Unlike `isProfileInCooldown`, this ignores `cooldownUntil` (rate limits)
+ * which are model-specific and should not block fallback to different models.
+ */
+export function isProfileBillingDisabled(store: AuthProfileStore, profileId: string): boolean {
+  const stats = store.usageStats?.[profileId];
+  if (!stats) {
+    return false;
+  }
+  return (
+    typeof stats.disabledUntil === "number" &&
+    stats.disabledUntil > 0 &&
+    Date.now() < stats.disabledUntil
+  );
+}
+
+/**
  * Mark a profile as successfully used. Resets error count and updates lastUsed.
  * Uses store lock to avoid overwriting concurrent usage updates.
  */

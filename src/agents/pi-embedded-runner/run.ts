@@ -6,6 +6,7 @@ import { enqueueCommandInLane } from "../../process/command-queue.js";
 import { isMarkdownCapableMessageChannel } from "../../utils/message-channel.js";
 import { resolveOpenClawAgentDir } from "../agent-paths.js";
 import {
+  isProfileBillingDisabled,
   isProfileInCooldown,
   markAuthProfileFailure,
   markAuthProfileGood,
@@ -380,7 +381,7 @@ export async function runEmbeddedPiAgent(
           if (
             candidate &&
             candidate !== lockedProfileId &&
-            isProfileInCooldown(authStore, candidate)
+            isProfileBillingDisabled(authStore, candidate)
           ) {
             profileIndex += 1;
             continue;
