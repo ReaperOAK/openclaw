@@ -25,7 +25,18 @@ export async function deliverWebReply(params: {
   connectionId?: string;
   skipLog?: boolean;
   tableMode?: MarkdownTableMode;
+  /** Safety-net: when true, refuse to deliver and log a warning. */
+  readOnly?: boolean;
 }) {
+  // ── DEFENSE-IN-DEPTH: read-only safety net ──────────────────────────
+  if (params.readOnly) {
+    whatsappOutboundLog.warn(
+      `deliverWebReply BLOCKED (readOnly flag) — reply to ${params.msg.from} suppressed`,
+    );
+    return;
+  }
+  // ── END safety net ──────────────────────────────────────────────────
+
   const { replyResult, msg, maxMediaBytes, textLimit, replyLogger, connectionId, skipLog } = params;
   const replyStarted = Date.now();
   const tableMode = params.tableMode ?? "code";
