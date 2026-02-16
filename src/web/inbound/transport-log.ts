@@ -144,7 +144,7 @@ export interface TransportLogEntry {
  * Called **before** the access control gate in monitor.ts so that every message
  * is captured regardless of dmPolicy / groupPolicy. Performs:
  *
- * 1. JSONL file write to `~/.openclaw/whatsapp-intel/messages-YYYY-MM-DD.jsonl`
+ * 1. JSONL file write to `~/.openclaw/workspace/whatsapp-intel/messages-YYYY-MM-DD.jsonl`
  * 2. Keyword/pattern urgency detection (zero AI cost)
  * 3. Telegram notification for urgent messages
  */
