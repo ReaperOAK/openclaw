@@ -21,6 +21,7 @@ import {
 } from "./extract.js";
 import { downloadInboundMedia } from "./media.js";
 import { createWebSendApi } from "./send-api.js";
+import { transportLog } from "./transport-log.js";
 
 export async function monitorWebInbox(options: {
   verbose: boolean;
@@ -212,6 +213,24 @@ export async function monitorWebInbox(options: {
         sock: { sendMessage: (jid, content) => sock.sendMessage(jid, content) },
         remoteJid,
       });
+
+      // ── Transport-level logging (pre-ACL gate) — zero AI cost ──────────
+      // Captures ALL messages regardless of dmPolicy for passive intelligence.
+      {
+        const logBody = extractText(msg.message ?? undefined) ?? "";
+        if (logBody) {
+          transportLog({
+            from: senderE164 ?? from,
+            pushName: msg.pushName ?? undefined,
+            content: logBody,
+            chatId: remoteJid,
+            isGroup: group,
+            groupSubject,
+            allowed: access.allowed,
+          });
+        }
+      }
+
       if (!access.allowed) {
         continue;
       }

@@ -1,0 +1,120 @@
+nohup: ignoring input
+
+> openclaw@2026.2.13 openclaw /home/ubuntu/openclaw
+> node scripts/run-node.mjs gateway run --port 18789 --force
+
+[90m2026-02-14T05:05:23.556Z[39m [36m[gateway][39m [36mControl UI assets missing; building (ui:build, auto-installs UI deps)…[39m
+[90m2026-02-14T05:05:26.701Z[39m [35m[canvas][39m [36mhost mounted at http://0.0.0.0:18789/__openclaw__/canvas/ (root /home/ubuntu/.openclaw/canvas)[39m
+[90m2026-02-14T05:05:26.778Z[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-02-14T05:05:26.787Z[39m [36m[gateway][39m [36magent model: github-copilot/gpt-5-mini[39m
+[90m2026-02-14T05:05:26.788Z[39m [36m[gateway][39m [36mlistening on ws://0.0.0.0:18789 (PID 40711)[39m
+[90m2026-02-14T05:05:26.790Z[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-02-14.log[39m
+[90m2026-02-14T05:05:26.818Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+[90m2026-02-14T05:05:26.838Z[39m [35m[whatsapp][39m [36m[default] starting provider (+917003080896)[39m
+[90m2026-02-14T05:05:28.234Z[39m [34m[telegram][39m [36m[default] starting provider (@Onyx_oakbot)[39m
+[90m2026-02-14T05:05:28.256Z[39m [34m[telegram][39m [36mautoSelectFamily=false (default-node22)[39m
+[90m2026-02-14T05:05:29.193Z[39m [35m[whatsapp][39m [36mListening for personal WhatsApp inbound messages.[39m
+[90m2026-02-14T05:06:01.097Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:06:01.102Z[39m [36m[ws][39m [36m⇄ res ✗ send 13ms errorCode=UNAVAILABLE errorMessage=Error: No delivery result channel=whatsapp error=Error: No delivery result conn=f543a88f…d822 id=cea7222e…5922[39m
+[90m2026-02-14T05:06:58.407Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 62 chars)[39m
+[90m2026-02-14T05:07:00.737Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 59 chars)[39m
+[90m2026-02-14T05:07:07.592Z[39m [35m[whatsapp][39m [36mBlocked WhatsApp auto-reply to +918697575966 (actions.sendMessage=false, account=default)[39m
+[90m2026-02-14T05:07:07.593Z[39m [35m[whatsapp][39m [36mAuto-replied to +918697575966[39m
+[90m2026-02-14T05:07:07.920Z[39m [35m[whatsapp][39m [36mInbound message +918820650749 -> +917003080896 (direct, 52 chars)[39m
+[90m2026-02-14T05:07:09.682Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 82 chars)[39m
+[90m2026-02-14T05:07:14.854Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:07:22.927Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 73 chars)[39m
+[90m2026-02-14T05:07:29.743Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 83 chars)[39m
+[90m2026-02-14T05:07:30.390Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:07:37.924Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:07:39.097Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 64 chars)[39m
+[90m2026-02-14T05:07:42.284Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 68 chars)[39m
+[90m2026-02-14T05:07:42.680Z[39m [35m[whatsapp][39m [36mInbound message +918820650749 -> +917003080896 (direct, 65 chars)[39m
+[90m2026-02-14T05:07:45.368Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:07:52.734Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:08:00.052Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:08:07.256Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:08:15.587Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:09:34.157Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 70 chars)[39m
+[90m2026-02-14T05:09:38.520Z[39m [35m[whatsapp][39m [36mInbound message +918820650749 -> +917003080896 (direct, 69 chars)[39m
+[90m2026-02-14T05:09:39.607Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 69 chars)[39m
+[90m2026-02-14T05:09:41.951Z[39m [35m[whatsapp][39m [36mBlocked WhatsApp auto-reply to +918697575966 (actions.sendMessage=false, account=default)[39m
+[90m2026-02-14T05:09:41.952Z[39m [35m[whatsapp][39m [36mAuto-replied to +918697575966[39m
+[90m2026-02-14T05:09:49.270Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:09:53.134Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 97 chars)[39m
+[90m2026-02-14T05:09:57.728Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 80 chars)[39m
+[90m2026-02-14T05:09:59.147Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:04.827Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 62 chars)[39m
+[90m2026-02-14T05:10:06.315Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 62 chars)[39m
+[90m2026-02-14T05:10:06.816Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:09.816Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 59 chars)[39m
+[90m2026-02-14T05:10:10.698Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 56 chars)[39m
+[90m2026-02-14T05:10:11.955Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 59 chars)[39m
+[90m2026-02-14T05:10:17.590Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 72 chars)[39m
+[90m2026-02-14T05:10:23.889Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 75 chars)[39m
+[90m2026-02-14T05:10:25.245Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:27.708Z[39m [35m[whatsapp][39m [36mInbound message +918697575966 -> +917003080896 (direct, 68 chars)[39m
+[90m2026-02-14T05:10:32.479Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:40.965Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:49.146Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:10:56.479Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:11:03.985Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:11:11.504Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:11:19.026Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+[90m2026-02-14T05:11:26.892Z[39m [35m[plugins][39m [36mwhatsapp-outbound-block: canceled outbound WhatsApp message[39m
+2026-02-14T05:17:17.390+00:00 [tools] exec failed: /bin/bash: line 1: openclaw: command not found
+
+Command exited with code 127
+[90m2026-02-14T05:20:42.350Z[39m [34m[reload][39m [36mconfig change detected; evaluating reload (meta.lastTouchedAt, plugins.entries.bluebubbles)[39m
+[90m2026-02-14T05:20:42.352Z[39m [34m[reload][39m [33mconfig change requires gateway restart (plugins.entries.bluebubbles)[39m
+[90m2026-02-14T05:20:42.354Z[39m [36m[gateway][39m [36msignal SIGUSR1 received[39m
+[90m2026-02-14T05:20:42.355Z[39m [36m[gateway][39m [36mreceived SIGUSR1; restarting[39m
+[90m2026-02-14T05:20:42.356Z[39m [36m[gateway][39m [36mdraining 2 active task(s) before restart (timeout 30000ms)[39m
+[90m2026-02-14T05:20:47.113Z[39m [36m[gateway][39m [36mall active tasks drained[39m
+[90m2026-02-14T05:20:47.128Z[39m [34m[gmail-watcher][39m [36mgmail watcher stopped[39m
+2026-02-14T05:20:48.178+00:00 [openclaw] Suppressed AbortError: AbortError: This operation was aborted
+    at node:internal/deps/undici/undici:14902:13
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+[90m2026-02-14T05:20:48.188Z[39m [35m[canvas][39m [36mhost mounted at http://0.0.0.0:18789/__openclaw__/canvas/ (root /home/ubuntu/.openclaw/canvas)[39m
+[90m2026-02-14T05:20:48.219Z[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-02-14T05:20:48.221Z[39m [36m[gateway][39m [36magent model: github-copilot/gpt-5-mini[39m
+[90m2026-02-14T05:20:48.222Z[39m [36m[gateway][39m [36mlistening on ws://0.0.0.0:18789 (PID 40711)[39m
+[90m2026-02-14T05:20:48.224Z[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-02-14.log[39m
+[90m2026-02-14T05:20:48.229Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+[90m2026-02-14T05:20:48.239Z[39m [35m[whatsapp][39m [36m[default] starting provider (+917003080896)[39m
+[90m2026-02-14T05:20:49.473Z[39m [35m[whatsapp][39m [36mListening for personal WhatsApp inbound messages.[39m
+[90m2026-02-14T05:20:49.590Z[39m [34m[telegram][39m [36m[default] starting provider (@Onyx_oakbot)[39m
+[90m2026-02-14T05:20:53.306Z[39m [34m[reload][39m [36mconfig change detected; evaluating reload (meta.lastTouchedAt, plugins.entries.diagnostics-otel)[39m
+[90m2026-02-14T05:20:53.307Z[39m [34m[reload][39m [33mconfig change requires gateway restart (plugins.entries.diagnostics-otel)[39m
+[90m2026-02-14T05:20:53.308Z[39m [36m[gateway][39m [36msignal SIGUSR1 received[39m
+[90m2026-02-14T05:20:53.309Z[39m [36m[gateway][39m [36mreceived SIGUSR1; restarting[39m
+[90m2026-02-14T05:20:53.318Z[39m [34m[gmail-watcher][39m [36mgmail watcher stopped[39m
+2026-02-14T05:20:53.468+00:00 [openclaw] Suppressed AbortError: AbortError: This operation was aborted
+    at node:internal/deps/undici/undici:14902:13
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+[90m2026-02-14T05:20:53.471Z[39m [35m[canvas][39m [36mhost mounted at http://0.0.0.0:18789/__openclaw__/canvas/ (root /home/ubuntu/.openclaw/canvas)[39m
+[90m2026-02-14T05:20:53.486Z[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-02-14T05:20:53.487Z[39m [36m[gateway][39m [36magent model: github-copilot/gpt-5-mini[39m
+[90m2026-02-14T05:20:53.488Z[39m [36m[gateway][39m [36mlistening on ws://0.0.0.0:18789 (PID 40711)[39m
+[90m2026-02-14T05:20:53.490Z[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-02-14.log[39m
+[90m2026-02-14T05:20:53.492Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+[90m2026-02-14T05:20:53.502Z[39m [35m[whatsapp][39m [36m[default] starting provider (+917003080896)[39m
+[90m2026-02-14T05:20:54.358Z[39m [34m[telegram][39m [36m[default] starting provider (@Onyx_oakbot)[39m
+[90m2026-02-14T05:20:54.699Z[39m [35m[whatsapp][39m [36mListening for personal WhatsApp inbound messages.[39m
+[90m2026-02-14T05:20:58.866Z[39m [34m[reload][39m [36mconfig change detected; evaluating reload (meta.lastTouchedAt, plugins.entries.discord)[39m
+[90m2026-02-14T05:20:58.867Z[39m [34m[reload][39m [33mconfig change requires gateway restart (plugins.entries.discord)[39m
+[90m2026-02-14T05:20:58.868Z[39m [36m[gateway][39m [36msignal SIGUSR1 received[39m
+[90m2026-02-14T05:20:58.869Z[39m [36m[gateway][39m [36mreceived SIGUSR1; restarting[39m
+[90m2026-02-14T05:20:58.876Z[39m [34m[gmail-watcher][39m [36mgmail watcher stopped[39m
+2026-02-14T05:20:58.921+00:00 [openclaw] Suppressed AbortError: AbortError: This operation was aborted
+    at node:internal/deps/undici/undici:14902:13
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+[90m2026-02-14T05:20:58.924Z[39m [35m[canvas][39m [36mhost mounted at http://0.0.0.0:18789/__openclaw__/canvas/ (root /home/ubuntu/.openclaw/canvas)[39m
+[90m2026-02-14T05:20:58.938Z[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-02-14T05:20:58.939Z[39m [36m[gateway][39m [36magent model: github-copilot/gpt-5-mini[39m
+[90m2026-02-14T05:20:58.940Z[39m [36m[gateway][39m [36mlistening on ws://0.0.0.0:18789 (PID 40711)[39m
+[90m2026-02-14T05:20:58.942Z[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-02-14.log[39m
+[90m2026-02-14T05:20:58.945Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+[90m2026-02-14T05:20:58.951Z[39m [35m[whatsapp][39m [36m[default] starting provider (+917003080896)[39m
+[90m2026-02-14T05:20:59.873Z[39m [34m[telegram][39m [36m[default] starting provider (@Onyx_oakbot)[39m
+[90m2026-02-14T05:21:00.255Z[39m [35m[whatsapp][39m [36mListening for personal WhatsApp inbound messages.[39m
