@@ -6,21 +6,21 @@ import type { AuthProfileStore } from "./auth-profiles.js";
 vi.mock("./auth-profiles.js", () => ({
   ensureAuthProfileStore: vi.fn(),
   getSoonestCooldownExpiry: vi.fn(),
-  isProfileInCooldown: vi.fn(),
+  isProfileBillingDisabled: vi.fn(),
   resolveAuthProfileOrder: vi.fn(),
 }));
 
 import {
   ensureAuthProfileStore,
   getSoonestCooldownExpiry,
-  isProfileInCooldown,
+  isProfileBillingDisabled,
   resolveAuthProfileOrder,
 } from "./auth-profiles.js";
 import { _probeThrottleInternals, runWithModelFallback } from "./model-fallback.js";
 
 const mockedEnsureAuthProfileStore = vi.mocked(ensureAuthProfileStore);
 const mockedGetSoonestCooldownExpiry = vi.mocked(getSoonestCooldownExpiry);
-const mockedIsProfileInCooldown = vi.mocked(isProfileInCooldown);
+const mockedIsProfileBillingDisabled = vi.mocked(isProfileBillingDisabled);
 const mockedResolveAuthProfileOrder = vi.mocked(resolveAuthProfileOrder);
 
 function makeCfg(overrides: Partial<OpenClawConfig> = {}): OpenClawConfig {
@@ -69,7 +69,7 @@ describe("runWithModelFallback – probe logic", () => {
       return [];
     });
     // Default: only openai profiles are in cooldown; fallback providers are available
-    mockedIsProfileInCooldown.mockImplementation((_store, profileId: string) => {
+    mockedIsProfileBillingDisabled.mockImplementation((_store, profileId: string) => {
       return profileId.startsWith("openai");
     });
   });
@@ -155,7 +155,7 @@ describe("runWithModelFallback – probe logic", () => {
     } as Partial<OpenClawConfig>);
 
     // Override: ALL providers in cooldown for this test
-    mockedIsProfileInCooldown.mockReturnValue(true);
+    mockedIsProfileBillingDisabled.mockReturnValue(true);
 
     // All profiles in cooldown, cooldown just about to expire
     const almostExpired = NOW + 30 * 1000; // 30s remaining

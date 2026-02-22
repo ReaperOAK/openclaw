@@ -1,9 +1,8 @@
 import type { OpenClawConfig } from "../config/config.js";
-import type { FailoverReason } from "./pi-embedded-helpers.js";
 import {
   ensureAuthProfileStore,
   getSoonestCooldownExpiry,
-  isProfileInCooldown,
+  isProfileBillingDisabled,
   resolveAuthProfileOrder,
 } from "./auth-profiles.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
@@ -21,6 +20,7 @@ import {
   resolveConfiguredModelRef,
   resolveModelRefFromString,
 } from "./model-selection.js";
+import type { FailoverReason } from "./pi-embedded-helpers.js";
 import { isLikelyContextOverflowError } from "./pi-embedded-helpers.js";
 
 type ModelCandidate = {
@@ -324,10 +324,12 @@ export async function runWithModelFallback<T>(params: {
         store: authStore,
         provider: candidate.provider,
       });
-      const isAnyProfileAvailable = profileIds.some((id) => !isProfileInCooldown(authStore, id));
+      const isAnyProfileUsable = profileIds.some((id) => !isProfileBillingDisabled(authStore, id));
 
-      if (profileIds.length > 0 && !isAnyProfileAvailable) {
-        // All profiles for this provider are in cooldown.
+      if (profileIds.length > 0 && !isAnyProfileUsable) {
+        // All profiles for this provider are billing-disabled.
+        // Note: rate-limit cooldowns are model-specific and do NOT block
+        // fallback to different models on the same provider.
         // For the primary model (i === 0), probe it if the soonest cooldown
         // expiry is close or already past. This avoids staying on a fallback
         // model long after the real rate-limit window clears.
@@ -346,7 +348,7 @@ export async function runWithModelFallback<T>(params: {
           attempts.push({
             provider: candidate.provider,
             model: candidate.model,
-            error: `Provider ${candidate.provider} is in cooldown (all profiles unavailable)`,
+            error: `Provider ${candidate.provider} is disabled (all profiles billing-blocked)`,
             reason: "rate_limit",
           });
           continue;

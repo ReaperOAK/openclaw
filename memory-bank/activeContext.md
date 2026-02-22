@@ -78,7 +78,7 @@ context pruning, canvas host, and memory flush all active.
 - **Gateway**: PID running on ws://0.0.0.0:18789, bind=lan, mode=local
 - **Canvas**: Mounted at http://0.0.0.0:18789/__openclaw__/canvas/
 - **Heartbeat**: Active, every 30m
-- **Channels**: Telegram (@Onyx_oakbot, pairing) + WhatsApp (+917003080896, passive read-only)
+- **Channels**: Telegram (@Onyx_oakbot, pairing) + WhatsApp (+917003080896, full read/write)
 - **Primary model**: qwen-portal/coder-model (free)
 - **Image model**: qwen-portal/vision-model → nemotron-vl:free → qwen3-vl:free
 - **Fallbacks**: 12-deep cascade across 5 providers (Qwen Portal, GitHub Copilot, Google Gemini CLI, OpenRouter, MiniMax Portal)
@@ -91,8 +91,24 @@ context pruning, canvas host, and memory flush all active.
 
 ## Active Plugins (Custom)
 
-- `whatsapp-outbound-block` — prevents all WhatsApp outbound messages
+- ~~`whatsapp-outbound-block`~~ — **REMOVED** (2026-02-21, jiti cache cleared, gateway restarted)
 - `whatsapp-passive-intel` — logs messages + urgency detection + Telegram alerts
+
+## Recent Changes (2026-02-21)
+
+### wacli Fix — WhatsApp Message Access Restored
+
+**Root causes identified & fixed:**
+
+1. **Go toolchain upgraded**: 1.22.2 → 1.25.7 (installed at /usr/local/go)
+2. **wacli rebuilt with FTS5**: `CGO_ENABLED=1 go install -tags sqlite_fts5 github.com/steipete/wacli/cmd/wacli@v0.2.0` — FTS5 now `true`
+3. **Persistent sync service created**: `wacli-sync.service` runs `wacli sync --follow` — captures live messages with full text
+4. **Gateway PATH fixed**: Added `/home/ubuntu/go/bin` and `/usr/local/go/bin` to openclaw-gateway.service PATH so agent can find wacli
+5. **Message coverage**: 6402 messages in DB, 4484 (70%) with text. Empty-text messages are a WhatsApp protocol limitation (history sync sends stubs without content for many messages — this is expected/documented behavior)
+
+**Services added:**
+
+- `wacli-sync.service` — enabled, auto-start on boot, runs `wacli sync --follow`
 
 ## Known Issues
 
@@ -100,10 +116,11 @@ context pruning, canvas host, and memory flush all active.
 - Gmail watcher needs GOG_KEYRING_PASSWORD for keyring access
 - Google Gemini CLI needs interactive OAuth login (configured but not authenticated)
 - Browser tools disabled (no GUI on OCI instance — set `browser.enabled: false`)
+- ~30% of WhatsApp messages have empty text — WhatsApp protocol limitation (history sync stubs), not a wacli bug
 
 ## Next Steps
 
-1. Monitor heartbeat + context pruning + memory flush behavior over 24h
+1. Monitor wacli-sync service stability over 24h
 2. Test canvas host with a real canvas artifact
 3. Authenticate Google Gemini CLI for 5 additional models
 4. Install Docker if sandbox execution is needed
@@ -115,6 +132,6 @@ context pruning, canvas host, and memory flush all active.
 - Using pnpm (not bun) for dependency management
 - Following AGENTS.md conventions for commit workflow
 - Sandbox mode=all enabled globally for security
-- WhatsApp is read-only (outbound-block plugin active)
+- WhatsApp is fully active (outbound-block plugin removed 2026-02-21)
 - BlueBubbles permanently disabled
 - Browser tools disabled (headless server)
